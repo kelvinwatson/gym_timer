@@ -1,0 +1,4 @@
+<resources>
+    <string name="over_time_channel_id">OVER_TIME_CHANNEL_ID</string>
+    <string name="over_time_channel_desc">Timer is up</string>
+</resources>
