@@ -20,6 +20,7 @@ class GymTimerViewModel(app: Application) : AndroidViewModel(app) {
     private val timesUpNotificationHelper = OverTimeNotificationHelper(app)
 
     private var countDownTimer: CountDownTimer? = null
+    private var countDownInProgressInternal = MutableStateFlow(false)
     private var blinkJob: Job? = null
 
     private val currentTimeRemainingMillis = MutableStateFlow(0L)
@@ -30,6 +31,9 @@ class GymTimerViewModel(app: Application) : AndroidViewModel(app) {
     private val blinkMessageInternal = MutableStateFlow("")
     val blinkMessage: StateFlow<String>
         get() = blinkMessageInternal
+
+    val allowNewCountDown :Boolean
+        get() = !countDownInProgressInternal.value
 
     private fun Long.toDisplayTime(): String = String.format(
         "%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(this),
@@ -44,12 +48,15 @@ class GymTimerViewModel(app: Application) : AndroidViewModel(app) {
         reset()
 
         countDownTimer = object : CountDownTimer(millis, 1000) {
+
             override fun onTick(millisUntilFinished: Long) {
+                countDownInProgressInternal.value = true
                 currentTimeRemainingMillis.value = millisUntilFinished
                 currentTimeRemainingDisplayInternal.value = millisUntilFinished.toDisplayTime()
             }
 
             override fun onFinish() {
+                countDownInProgressInternal.value = false
                 blinkAndNotify()
             }
         }.start()
@@ -70,6 +77,7 @@ class GymTimerViewModel(app: Application) : AndroidViewModel(app) {
         blinkMessageInternal.value = ""
         countDownTimer?.cancel()
         currentTimeRemainingDisplayInternal.value = "00:00:00"
+        countDownInProgressInternal.value = false
     }
 
     /**
@@ -78,11 +86,13 @@ class GymTimerViewModel(app: Application) : AndroidViewModel(app) {
     fun resume() {
         countDownTimer = object : CountDownTimer(currentTimeRemainingMillis.value, 1000) {
             override fun onTick(millisUntilFinished: Long) {
+                countDownInProgressInternal.value = true
                 currentTimeRemainingMillis.value = millisUntilFinished
                 currentTimeRemainingDisplayInternal.value = millisUntilFinished.toDisplayTime()
             }
 
             override fun onFinish() {
+                countDownInProgressInternal.value = false
                 blinkAndNotify()
             }
         }.start()

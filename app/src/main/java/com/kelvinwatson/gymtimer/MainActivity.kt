@@ -1,8 +1,12 @@
 package com.kelvinwatson.gymtimer
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
@@ -14,28 +18,36 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.kelvinwatson.gymtimer.ui.theme.GymTimerTheme
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kelvinwatson.gymtimer.ui.theme.GymTimerTheme
 
 class MainActivity : ComponentActivity() {
+
+    private val viewModel: GymTimerViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             GymTimerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    GymTimerScreen()
+                    GymTimerScreen(viewModel)
                 }
             }
         }
     }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        viewModel.reset()
+    }
 }
 
 @Composable
-fun GymTimerScreen(gymTimerViewModel: GymTimerViewModel = viewModel()) {
+fun GymTimerScreen(gymTimerViewModel: GymTimerViewModel) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -62,27 +74,51 @@ fun GymTimerScreen(gymTimerViewModel: GymTimerViewModel = viewModel()) {
             Text("Resume")
         }
 
-        Button(onClick = {
-            gymTimerViewModel.countDown(30_000L)
-        }) {
+        Button(
+            enabled = gymTimerViewModel.allowNewCountDown,
+            onClick = {
+                gymTimerViewModel.countDown(10_000L)
+            }) {
+            Text("10 seconds")
+        }
+
+        Button(
+            enabled = gymTimerViewModel.allowNewCountDown,
+            onClick = {
+                gymTimerViewModel.countDown(15_000L)
+            }) {
+            Text("15 seconds")
+        }
+
+        Button(
+            enabled = gymTimerViewModel.allowNewCountDown,
+            onClick = {
+                gymTimerViewModel.countDown(30_000L)
+            }) {
             Text("30 seconds")
         }
 
-        Button(onClick = {
-            gymTimerViewModel.countDown(60_000L)
-        }) {
+        Button(
+            enabled = gymTimerViewModel.allowNewCountDown,
+            onClick = {
+                gymTimerViewModel.countDown(60_000L)
+            }) {
             Text("60 seconds")
         }
 
-        Button(onClick = {
-            gymTimerViewModel.countDown(90_000L)
-        }) {
+        Button(
+            enabled = gymTimerViewModel.allowNewCountDown,
+            onClick = {
+                gymTimerViewModel.countDown(90_000L)
+            }) {
             Text("90 seconds")
         }
 
-        Button(onClick = {
-            gymTimerViewModel.reset()
-        }) {
+        Button(
+            enabled = gymTimerViewModel.allowNewCountDown,
+            onClick = {
+                gymTimerViewModel.reset()
+            }) {
             Text("Reset")
         }
     }
@@ -90,8 +126,8 @@ fun GymTimerScreen(gymTimerViewModel: GymTimerViewModel = viewModel()) {
 
 @Preview(showBackground = true)
 @Composable
-fun DefaultPreview() {
+fun DefaultPreview(gymTimerViewModel: GymTimerViewModel = viewModel()) {
     GymTimerTheme {
-        GymTimerScreen()
+        GymTimerScreen(gymTimerViewModel)
     }
 }

@@ -10,13 +10,14 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 
 class OverTimeNotificationHelper(private val context: Context) {
+
     init {
         createNotificationChannel()
     }
-
     private var notificationBuilder: NotificationCompat.Builder? = null
 
     fun onOverTime(secondsOverTime: Int = 0) {
+
         // Create an explicit intent for an Activity in your app
         val intent = Intent(context, MainActivity::class.java)
         val pendingIntent =
@@ -27,14 +28,15 @@ class OverTimeNotificationHelper(private val context: Context) {
                 CHANNEL_ID_OVER_TIME
             )
             notificationBuilder?.let { builder ->
+                builder.setSmallIcon(R.drawable.ic_launcher_background)
                 builder.setContentTitle("Times up!")
                 builder.setContentText("$secondsOverTime over time")
-                builder.priority = NotificationCompat.PRIORITY_DEFAULT
+                builder.priority = NotificationCompat.PRIORITY_HIGH
                 // Set the intent that will fire when the user taps the notification
                 builder.setContentIntent(pendingIntent)
                 // automatically removes the notification when the user taps it
                 builder.setAutoCancel(true)
-                // notificationId is a unique int for each notification that you must define
+                 // notificationId is a unique int for each notification that you must define
                 NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, builder.build())
             }
         } else {
@@ -55,7 +57,7 @@ class OverTimeNotificationHelper(private val context: Context) {
             val descriptionText = context.getString(R.string.over_time_channel_desc)
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(CHANNEL_ID_OVER_TIME, name, importance).apply {
-                description = descriptionText
+                 description = descriptionText
             }
             // Register the channel with the system
             val notificationManager: NotificationManager =
