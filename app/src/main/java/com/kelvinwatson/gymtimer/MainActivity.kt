@@ -115,7 +115,6 @@ fun GymTimerScreen(gymTimerViewModel: GymTimerViewModel) {
         }
 
         Button(
-            enabled = gymTimerViewModel.allowNewCountDown,
             onClick = {
                 gymTimerViewModel.reset()
             }) {
